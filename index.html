@@ -138,6 +138,34 @@ button {
 .back { background: transparent; color: var(--fg); }
 
 .submitted-msg { text-align: center; padding: 20px 0; }
+
+/* Tablet and Laptop Scaling */
+@media (min-width: 768px) {
+  .container {
+    max-width: 650px; /* Wider card for laptops */
+    padding: 80px 20px;
+  }
+
+  h3 {
+    font-size: 20px; /* Larger question text */
+    margin-bottom: 24px;
+  }
+
+  .option {
+    font-size: 18px; /* Larger options */
+    padding: 18px;
+  }
+
+  input[type=text], input[type=tel], textarea {
+    font-size: 18px;
+  }
+
+  button {
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 400px) {
   .card { padding: 18px; }      /* Shrinks internal spacing on tiny screens */
   button { padding: 12px 18px; } /* Makes buttons slightly smaller to fit side-by-side */
@@ -314,11 +342,11 @@ Takes 3–4 minutes. Responses are anonymous.
     <h3 style="font-size: 24px;">Thank you 🙏</h3>
     
     <p id="msg-student" style="font-size:14px;line-height:1.5">
-      Thank you for completing the survey. Your responses will help improve voice input for studying.
+      Thank you for completing the survey. Your responses will help improve in understanding problem related to ChatGPT's voice input.
     </p>
 
     <p id="msg-nonstudent" class="hidden" style="font-size:14px;line-height:1.5; color: #888;">
-      Since this specific study is focused on student learning patterns, the survey has concluded here. We appreciate your time!
+      Since this specific study is focused on student's ChatGPT voice input usage, the survey has concluded here. We appreciate your time!
     </p>
   </div>
 </div>
@@ -459,7 +487,7 @@ function update(){
       msgNonStudent.classList.add('hidden');
     }
   }
-  
+
   document.querySelector('.back').style.visibility = id === 'home' ? 'hidden' : 'visible';
   document.getElementById('nav').style.display = id === 'thankyou' ? 'none' : 'flex';
 
