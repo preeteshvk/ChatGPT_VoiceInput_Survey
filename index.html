@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Voice Input Usage Survey</title>
+
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --card: #f4f4f4;
+  --border: #ddd;
+  --accent: #000;
+  --accent-fg: #fff;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0f;
+    --fg: #f2f2f2;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #fff;
+    --accent-fg: #000;
+  }
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.progress-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width .3s ease;
+}
+
+.container {
+  width: 100%;
+  max-width: 520px;
+  padding: 40px 20px;
+  margin: auto;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.hidden { display: none !important; }
+.screen { display: none; animation: fadeIn 0.2s ease-out; }
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h3 { font-size: 16px; line-height: 1.4; margin-bottom: 20px; font-weight: 600; }
+
+.option {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  background: var(--bg);
+  transition: background 0.2s;
+}
+
+.option:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(128, 128, 128, 0.05);
+}
+
+input[type=radio] { transform: scale(1.2); accent-color: var(--accent); }
+
+input[type=text], input[type=tel], textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 16px;
+}
+
+textarea { min-height: 100px; resize: none; }
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+button {
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.next { background: var(--accent); color: var(--accent-fg); }
+.next:disabled { opacity: .3; cursor: not-allowed; }
+.back { background: transparent; color: var(--fg); }
+
+.submitted-msg { text-align: center; padding: 20px 0; }
+@media (max-width: 400px) {
+  .card { padding: 18px; }      /* Shrinks internal spacing on tiny screens */
+  button { padding: 12px 18px; } /* Makes buttons slightly smaller to fit side-by-side */
+}
+</style>
+</head>
+
+<body>
+
+<div id="progressWrap" class="progress-wrap hidden">
+  <div class="progress-bar"><div id="bar" class="progress-fill"></div></div>
+</div>
+
+<div class="container">
+<div class="card" id="mainCard">
+<form id="form">
+
+<div class="screen active" data-id="home">
+<h3>Voice Input Usage for Studying (ChatGPT Mobile)</h3>
+<p style="font-size:14px;line-height:1.5; opacity: 0.8;">
+This survey is about how students use ChatGPT mobile for studying, especially voice input.<br><br>
+Takes 3–4 minutes. Responses are anonymous.
+</p>
+</div>
+
+<div class="screen" data-id="q1">
+  <h3 class="q" data-text="Current status"></h3>
+  <label class="option"><input type="radio" name="q1" value="Undergraduate" required>Undergraduate student</label>
+  <label class="option"><input type="radio" name="q1" value="Postgraduate">Postgraduate student</label>
+  <label class="option"><input type="radio" name="q1" value="Not a student">Not a student</label>
+</div>
+
+<div class="screen" data-id="q2">
+  <h3 class="q" data-text="Type of college"></h3>
+  <label class="option"><input type="radio" name="q2" value="Government/State University" required>Government / State university</label>
+  <label class="option"><input type="radio" name="q2" value="Private Local College">Private local college</label>
+  <label class="option"><input type="radio" name="q2" value="National/Elite Institute">National / elite institute (IIT, NIT, etc.)</label>
+  <label class="option"><input type="radio" name="q2" value="Other">Other (please specify)</label>
+  <input type="text" name="q2_other" class="hidden" placeholder="Type here...">
+</div>
+
+<div class="screen" data-id="q3">
+  <h3 class="q" data-text="Language you mostly think in while studying"></h3>
+  <label class="option"><input type="radio" name="q3" value="Hindi" required>Hindi</label>
+  <label class="option"><input type="radio" name="q3" value="Hindi + English">Hindi + English</label>
+  <label class="option"><input type="radio" name="q3" value="English">English</label>
+  <label class="option"><input type="radio" name="q3" value="Other Regional">Other regional language</label>
+</div>
+
+<div class="screen" data-id="q4">
+  <h3 class="q" data-text="How often do you use ChatGPT for studying?"></h3>
+  <label class="option"><input type="radio" name="q4" value="Daily" required>Daily</label>
+  <label class="option"><input type="radio" name="q4" value="Weekly">A few times a week</label>
+  <label class="option"><input type="radio" name="q4" value="Monthly">A few times a month</label>
+  <label class="option"><input type="radio" name="q4" value="Rarely">Rarely</label>
+  <label class="option"><input type="radio" name="q4" value="Never">Never</label>
+</div>
+
+<div class="screen" data-id="q5">
+  <h3 class="q" data-text="Which input method do you usually use in ChatGPT?"></h3>
+  <label class="option"><input type="radio" name="q5" value="Typing Only" required>Typing only</label>
+  <label class="option"><input type="radio" name="q5" value="Mostly Typing">Mostly typing, sometimes voice</label>
+  <label class="option"><input type="radio" name="q5" value="Mostly Voice">Mostly voice</label>
+  <label class="option"><input type="radio" name="q5" value="Voice Only">Voice only</label>
+</div>
+
+<div class="screen" data-id="q6">
+  <h3 class="q" data-text="Have you ever used voice input in ChatGPT?"></h3>
+  <label class="option"><input type="radio" name="q6" value="Yes" required>Yes</label>
+  <label class="option"><input type="radio" name="q6" value="No">No</label>
+</div>
+
+<div class="screen" data-id="q7">
+  <h3 class="q" data-text="How often do you use voice search on YouTube or Google?"></h3>
+  <label class="option"><input type="radio" name="q7" value="Daily" required>Daily</label>
+  <label class="option"><input type="radio" name="q7" value="2-3 times/week">2–3 times a week</label>
+  <label class="option"><input type="radio" name="q7" value="Once a week">Once a week</label>
+  <label class="option"><input type="radio" name="q7" value="Rarely">Rarely / less than once a week</label>
+  <label class="option"><input type="radio" name="q7" value="Never">Never</label>
+</div>
+
+<div class="screen" data-id="q8">
+  <h3 class="q" data-text="How often do you send voice notes on WhatsApp?"></h3>
+  <label class="option"><input type="radio" name="q8" value="Daily/Often" required>Very often (daily or almost daily)</label>
+  <label class="option"><input type="radio" name="q8" value="Sometimes">Sometimes (1–3 times per week)</label>
+  <label class="option"><input type="radio" name="q8" value="Rarely">Rarely (less than once a week)</label>
+  <label class="option"><input type="radio" name="q8" value="Never">Never</label>
+</div>
+
+<div class="screen" data-id="q9">
+  <h3 class="q" data-text="Have you ever shortened/simplified a study question because typing felt difficult?"></h3>
+  <label class="option"><input type="radio" name="q9" value="Often" required>Yes, often</label>
+  <label class="option"><input type="radio" name="q9" value="Sometimes">Yes, sometimes</label>
+  <label class="option"><input type="radio" name="q9" value="Rarely">Rarely</label>
+  <label class="option"><input type="radio" name="q9" value="Never">Never</label>
+</div>
+
+<div class="screen conditional" data-id="q10">
+  <h3 class="q" data-text="Have you ever repeated a spoken question because ChatGPT didn’t understand?"></h3>
+  <label class="option"><input type="radio" name="q10" value="Often">Yes, often</label>
+  <label class="option"><input type="radio" name="q10" value="Sometimes">Yes, sometimes</label>
+  <label class="option"><input type="radio" name="q10" value="Rarely">Rarely</label>
+  <label class="option"><input type="radio" name="q10" value="Never">Never</label>
+</div>
+
+<div class="screen" data-id="q11">
+  <h3 class="q" data-text="If you avoided using voice, what was the main reason?"></h3>
+  <label class="option"><input type="radio" name="q11" value="Misunderstood" required>ChatGPT misunderstood me before</label>
+  <label class="option"><input type="radio" name="q11" value="Typing faster">Typing is faster/easier</label>
+  <label class="option"><input type="radio" name="q11" value="Preference">I prefer typing out my question</label>
+  <label class="option"><input type="radio" name="q11" value="Never tried">I haven’t tried it yet</label>
+  <label class="option"><input type="radio" name="q11" value="Other">Other (please specify)</label>
+  <input type="text" name="q11_other" class="hidden" placeholder="Please specify...">
+</div>
+
+<div class="screen" data-id="q12">
+  <h3 class="q" data-text="Which method did you use for questions needing careful thought?"></h3>
+  <label class="option"><input type="radio" name="q12" value="Typing" required>Typing</label>
+  <label class="option"><input type="radio" name="q12" value="Speaking">Speaking</label>
+  <label class="option"><input type="radio" name="q12" value="Both equally">Both equally</label>
+</div>
+
+<div class="screen" data-id="q13">
+  <h3 class="q" data-text="Did you type instead of speaking because it felt more 'serious'?"></h3>
+  <label class="option"><input type="radio" name="q13" value="Often" required>Yes, often</label>
+  <label class="option"><input type="radio" name="q13" value="Sometimes">Yes, sometimes</label>
+  <label class="option"><input type="radio" name="q13" value="Rarely">Rarely</label>
+  <label class="option"><input type="radio" name="q13" value="Never">Never</label>
+</div>
+
+<div class="screen" data-id="q14">
+  <h3 class="q" data-text="Had you used voice to ask full study questions before this survey?"></h3>
+  <label class="option"><input type="radio" name="q14" value="Yes" required>Yes</label>
+  <label class="option"><input type="radio" name="q14" value="No">No</label>
+</div>
+
+<div class="screen" data-id="q15">
+  <h3 class="q" data-text="How often did you notice the voice icon in the app?"></h3>
+  <label class="option"><input type="radio" name="q15" value="Always" required>Always</label>
+  <label class="option"><input type="radio" name="q15" value="Sometimes">Sometimes</label>
+  <label class="option"><input type="radio" name="q15" value="Rarely">Rarely</label>
+  <label class="option"><input type="radio" name="q15" value="Never">Never</label>
+</div>
+
+<div class="screen conditional" data-id="q16">
+  <h3 class="q" data-text="If ChatGPT got the speech wrong, what did you usually do?"></h3>
+  <label class="option"><input type="radio" name="q16" value="Edit text">Edit the text</label>
+  <label class="option"><input type="radio" name="q16" value="Re-type whole">Re-type the whole question</label>
+  <label class="option"><input type="radio" name="q16" value="Switch to typing">Switch back to typing</label>
+  <label class="option"><input type="radio" name="q16" value="Stop using voice">Stop using voice after that</label>
+  <label class="option"><input type="radio" name="q16" value="Other">Other (please specify)</label>
+  <input type="text" name="q16_other" class="hidden" placeholder="Please specify...">
+</div>
+
+<div class="screen" data-id="q17">
+  <h3 class="q" data-text="Why did you choose typing or speaking for study questions?"></h3>
+  <textarea name="q17" placeholder="Type your answer here..."></textarea>
+</div>
+
+<div class="screen" data-id="q18">
+  <h3 class="q" data-text="What would make you more likely to use voice for studying?"></h3>
+  <textarea name="q18" placeholder="Type your answer here..."></textarea>
+</div>
+
+<div class="screen" data-id="q19">
+  <h3 class="q" data-text="Willing to talk for 15 minutes about your usage?"></h3>
+  <label class="option"><input type="radio" name="q19" value="Yes">Yes</label>
+  <label class="option"><input type="radio" name="q19" value="No">No</label>
+  <input type="tel" name="contact" class="hidden" placeholder="10-digit mobile number" maxlength="10">
+</div>
+
+<div class="screen" data-id="thankyou">
+<div style="text-align:center">
+  <h3 style="font-size: 24px;">Thank you 🙏</h3>
+  <p style="font-size:14px;line-height:1.5">Thank you for completing the survey. Your responses will help improve voice input for studying.</p>
+</div>
+</div>
+
+<div class="nav" id="nav">
+<button type="button" class="back" onclick="prev()">Back</button>
+<button type="button" class="next" id="nextBtn" onclick="next()" disabled>Next</button>
+</div>
+
+</form>
+</div>
+</div>
+
+<script>
+// --- CONFIGURATION ---
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCwlqfxStEkBKTVwgyBD4bTG-dGmzmjMpDYpwkJLtVsAXTcOR80NAwdHXIcxRFyeFn/exec"; 
+
+const screens = [...document.querySelectorAll('.screen')];
+const bar = document.getElementById('bar');
+const wrap = document.getElementById('progressWrap');
+const nextBtn = document.getElementById('nextBtn');
+let index = 0;
+
+// Check if user already submitted
+function checkExisting() {
+  if (localStorage.getItem('survey_done')) {
+    document.getElementById('mainCard').innerHTML = `
+      <div class="submitted-msg">
+        <h3>Already Submitted</h3>
+        <p style="opacity:0.8; font-size:14px;">You have already completed this survey from this device. Thank you!</p>
+      </div>`;
+    document.getElementById('nav').style.display = 'none';
+    wrap.classList.add('hidden');
+    return true;
+  }
+  return false;
+}
+
+function eligible(s){
+  const q6 = document.querySelector('input[name="q6"]:checked')?.value;
+  if(s.classList.contains('conditional') && q6 !== 'Yes') return false;
+  return true;
+}
+
+function updateProgress(){
+  const id = screens[index].dataset.id;
+  if(id === 'home' || id === 'thankyou'){ wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  const flow = screens.filter(eligible).filter(s => !['home','thankyou'].includes(s.dataset.id));
+  const pos = flow.indexOf(screens[index]);
+  const pct = Math.round((pos / (flow.length - 1)) * 100);
+  bar.style.width = pct + '%';
+}
+
+function validate(){
+  const s = screens[index];
+  let ok = true;
+  const radios = s.querySelectorAll('input[type=radio]');
+  if(radios.length) ok = [...radios].some(r => r.checked);
+  const text = s.querySelector('input:not(.hidden)[type=text], textarea:not(.hidden), input:not(.hidden)[type=tel]');
+  if(text){
+    if(!text.value.trim()) ok = false;
+    if(text.type === 'tel' && !/^\d{10}$/.test(text.value)) ok = false;
+  }
+  nextBtn.disabled = !ok;
+}
+
+async function submitData() {
+  nextBtn.disabled = true;
+  nextBtn.textContent = "Saving...";
+  const formData = new FormData(document.getElementById('form'));
+  try {
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(formData) });
+    localStorage.setItem('survey_done', 'true'); // Set flag
+    screens[index].classList.remove('active');
+    index = screens.length - 1; 
+    screens[index].classList.add('active');
+    update();
+  } catch (e) {
+    alert("Connection error. Please try again.");
+    nextBtn.disabled = false;
+    nextBtn.textContent = "Next";
+  }
+}
+
+function next(){
+  const currentId = screens[index].dataset.id;
+  // If we are on the final question (q19), submit data
+  if (index === screens.length - 2) {
+    submitData();
+  } else {
+    screens[index].classList.remove('active');
+    do { index++; } while(index < screens.length && !eligible(screens[index]));
+    screens[index].classList.add('active');
+    update();
+  }
+}
+
+function prev(){
+  screens[index].classList.remove('active');
+  do { index--; } while(index >= 0 && !eligible(screens[index]));
+  screens[index].classList.add('active');
+  update();
+}
+
+function update(){
+  validate();
+  updateProgress();
+  const id = screens[index].dataset.id;
+  document.querySelector('.back').style.visibility = id === 'home' ? 'hidden' : 'visible';
+  document.getElementById('nav').style.display = id === 'thankyou' ? 'none' : 'flex';
+
+  const h = screens[index].querySelector('.q');
+  if (h) {
+    const flow = screens.filter(eligible).filter(s => !['home','thankyou'].includes(s.dataset.id));
+    const pos = flow.indexOf(screens[index]) + 1;
+    h.textContent = `Question ${pos}. ${h.dataset.text}`;
+  }
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('input, textarea').forEach(el=>{
+  el.addEventListener('input', validate);
+  el.addEventListener('change', ()=>{
+    const screen = el.closest('.screen');
+    const otherInput = screen.querySelector('input[type=text]');
+    if(otherInput && el.type === 'radio') {
+      otherInput.classList.toggle('hidden', el.value !== 'Other');
+      otherInput.required = el.value === 'Other';
+    }
+    if(el.name === 'q19'){
+      const c = document.querySelector('input[name="contact"]');
+      c.classList.toggle('hidden', el.value !== 'Yes');
+      c.required = el.value === 'Yes';
+    }
+    validate();
+  });
+});
+
+if(!checkExisting()) update();
+</script>
+</body>
+</html>
