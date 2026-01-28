@@ -310,10 +310,17 @@ Takes 3–4 minutes. Responses are anonymous.
 </div>
 
 <div class="screen" data-id="thankyou">
-<div style="text-align:center">
-  <h3 style="font-size: 24px;">Thank you 🙏</h3>
-  <p style="font-size:14px;line-height:1.5">Thank you for completing the survey. Your responses will help improve voice input for studying.</p>
-</div>
+  <div style="text-align:center">
+    <h3 style="font-size: 24px;">Thank you 🙏</h3>
+    
+    <p id="msg-student" style="font-size:14px;line-height:1.5">
+      Thank you for completing the survey. Your responses will help improve voice input for studying.
+    </p>
+
+    <p id="msg-nonstudent" class="hidden" style="font-size:14px;line-height:1.5; color: #888;">
+      Since this specific study is focused on student learning patterns, the survey has concluded here. We appreciate your time!
+    </p>
+  </div>
 </div>
 
 <div class="nav" id="nav">
@@ -351,8 +358,20 @@ function checkExisting() {
 }
 
 function eligible(s){
+  const q1 = document.querySelector('input[name="q1"]:checked')?.value;
   const q6 = document.querySelector('input[name="q6"]:checked')?.value;
-  if(s.classList.contains('conditional') && q6 !== 'Yes') return false;
+  const id = s.dataset.id;
+
+  // 1. If "Not a student" is selected, skip everything except Home and Thank You
+  if (q1 === 'Not a student' && !['home', 'q1', 'thankyou'].includes(id)) {
+    return false;
+  }
+
+  // 2. Existing logic for Voice Usage (Q6)
+  if (s.classList.contains('conditional') && q6 !== 'Yes') {
+    return false;
+  }
+
   return true;
 }
 
@@ -398,9 +417,13 @@ async function submitData() {
 }
 
 function next(){
+  const q1 = document.querySelector('input[name="q1"]:checked')?.value;
   const currentId = screens[index].dataset.id;
-  // If we are on the final question (q19), submit data
-  if (index === screens.length - 2) {
+
+  // Trigger submission if:
+  // - It's the last question (Q19)
+  // - OR it's Q1 and they are NOT a student
+  if (index === screens.length - 2 || (currentId === 'q1' && q1 === 'Not a student')) {
     submitData();
   } else {
     screens[index].classList.remove('active');
@@ -421,6 +444,22 @@ function update(){
   validate();
   updateProgress();
   const id = screens[index].dataset.id;
+
+  // Logic for the Thank You page message
+  if (id === 'thankyou') {
+    const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+    const msgStudent = document.getElementById('msg-student');
+    const msgNonStudent = document.getElementById('msg-nonstudent');
+
+    if (q1 === 'Not a student') {
+      msgStudent.classList.add('hidden');
+      msgNonStudent.classList.remove('hidden');
+    } else {
+      msgStudent.classList.remove('hidden');
+      msgNonStudent.classList.add('hidden');
+    }
+  }
+  
   document.querySelector('.back').style.visibility = id === 'home' ? 'hidden' : 'visible';
   document.getElementById('nav').style.display = id === 'thankyou' ? 'none' : 'flex';
 
